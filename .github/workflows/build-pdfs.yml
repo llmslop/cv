@@ -1,0 +1,35 @@
+name: Build PDF CVs
+
+on:
+  push:
+    branches:
+      - '*'
+
+jobs:
+  build-pdfs:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Build main.typ PDF
+        uses: lvignoli/typst-action@main
+        with:
+          source_file: main.typ
+          output_file: main.pdf
+      
+      - name: Build main_2lang.typ PDF
+        uses: lvignoli/typst-action@main
+        with:
+          source_file: main_2lang.typ
+          output_file: main_2lang.pdf
+      
+      - name: Upload PDFs as artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: cv-pdfs
+          path: |
+            main.pdf
+            main_2lang.pdf
+          retention-days: 90
