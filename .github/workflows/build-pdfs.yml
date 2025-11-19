@@ -19,14 +19,15 @@ jobs:
         run: |
           mkdir -p fonts/inconsolatazi4
           mkdir -p fonts/fontawesome
+          mkdir -p fonts/cabin
 
           # Inconsolatazi4 Regular
-          curl -L -o fonts/inconsolatazi4/Inconsolatazi4-Regular.ttf \
-            https://github.com/google/fonts/raw/main/ofl/inconsolatazi4/Inconsolatazi4-Regular.ttf
+          curl -L -o fonts/inconsolatazi4/Inconsolatazi4-Regular.otf \
+            https://mirrors.ctan.org/fonts/inconsolata/opentype/Inconsolatazi4-Regular.otf
 
-          # Inconsolatazi4 Bold (optional)
-          curl -L -o fonts/inconsolatazi4/Inconsolatazi4-Bold.ttf \
-            https://github.com/google/fonts/raw/main/ofl/inconsolatazi4/Inconsolatazi4-Bold.ttf
+          # Cabin Regular
+          curl -L -o fonts/cabin/Cabin-Regular.otf \
+            https://github.com/impallari/Cabin/raw/refs/heads/master/fonts/OTF/Cabin-Regular.otf
 
           # Download Font Awesome release zip
           curl -L -o fa.zip \
@@ -35,20 +36,19 @@ jobs:
           # Extract OTF/TTF
           unzip fa.zip -d fa
           cp fa/*/otfs/*.otf fonts/fontawesome/
+
+      - name: Setup Typst
+        uses: typst-community/setup-typst@v4
       
       - name: Build main.typ PDF
-        uses: lvignoli/typst-action@main
+        run: typst compile main.typ main.pdf
         env:
           TYPST_FONT_PATHS: ./fonts
-        with:
-          source_file: main.typ
-          output_file: main.pdf
       
-      - name: Build main_2lang.typ PDF
-        uses: lvignoli/typst-action@main
-        with:
-          source_file: main_2lang.typ
-          output_file: main_2lang.pdf
+      - name: Build main.typ PDF
+        run: typst compile main_2lang.typ main_2lang.pdf
+        env:
+          TYPST_FONT_PATHS: ./fonts
       
       - name: Upload PDFs as artifacts
         uses: actions/upload-artifact@v4
