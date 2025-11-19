@@ -15,20 +15,31 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install Font Awesome
-        run: sudo apt-get update && sudo apt-get install -y fonts-font-awesome
-
-      # Install Inconsolatazi4 manually
-      - name: Install Inconsolatazi4
+      - name: Download fonts (Inconsolatazi4 + Font Awesome)
         run: |
-          sudo mkdir -p /usr/share/fonts/truetype/inconsolatazi4
-          cd /usr/share/fonts/truetype/inconsolatazi4
-          sudo curl -L -o Inconsolatazi4-Regular.ttf \
+          mkdir -p fonts/inconsolatazi4
+          mkdir -p fonts/fontawesome
+
+          # Inconsolatazi4 Regular
+          curl -L -o fonts/inconsolatazi4/Inconsolatazi4-Regular.ttf \
             https://github.com/google/fonts/raw/main/ofl/inconsolatazi4/Inconsolatazi4-Regular.ttf
-          sudo fc-cache -f -v
+
+          # Inconsolatazi4 Bold (optional)
+          curl -L -o fonts/inconsolatazi4/Inconsolatazi4-Bold.ttf \
+            https://github.com/google/fonts/raw/main/ofl/inconsolatazi4/Inconsolatazi4-Bold.ttf
+
+          # Download Font Awesome release zip
+          curl -L -o fa.zip \
+            https://use.fontawesome.com/releases/v7.1.0/fontawesome-free-7.1.0-desktop.zip
+
+          # Extract OTF/TTF
+          unzip fa.zip -d fa
+          cp fa/*/otfs/*.otf fonts/fontawesome/
       
       - name: Build main.typ PDF
         uses: lvignoli/typst-action@main
+        env:
+          TYPST_FONT_PATHS: ./fonts
         with:
           source_file: main.typ
           output_file: main.pdf
